@@ -1,0 +1,6 @@
+{
+  "text.hltweaker.level": "等级",
+  "text.hltweaker.unknown_level": "未知",
+
+  "tooltip.hltweaker.harvest_level": "挖掘等级: %s"
+}

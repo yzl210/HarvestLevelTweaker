@@ -1,0 +1,6 @@
+{
+  "text.hltweaker.level": "Level",
+  "text.hltweaker.unknown_level": "Unknown",
+
+  "tooltip.hltweaker.harvest_level": "Harvest Level: %s"
+}

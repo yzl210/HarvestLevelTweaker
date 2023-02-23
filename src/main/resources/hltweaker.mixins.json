@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.leomc.hltweaker.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "hltweaker.refmap.json",
+  "mixins": [
+    "TOPHarvestInfoToolsMixin"
+  ],
+  "client": [
+    "JadeHarvestToolProviderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
