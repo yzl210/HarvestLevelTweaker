@@ -29,7 +29,7 @@ public class HLTConfig {
 
     static {
         HARVEST_LEVELS = COMMON_BUILDER
-                .comment("Define new harvest levels here, <id>,<level>,<name> (level start from 5, 0-4 are vanilla levels), example: cobalt:5:The Cobalt Level")
+                .comment("Define new harvest levels here, <id>,<level> (level start from 5, 0-4 are vanilla levels), example: cobalt,5")
                 .defineList("harvest_levels",
                         List.of(), s -> s instanceof String);
         COMMON_CONFIG = COMMON_BUILDER.build();
