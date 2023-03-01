@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "hltweaker.refmap.json",
   "mixins": [
+    "TiCHarvestTiersMixin",
     "TOPHarvestInfoToolsMixin"
   ],
   "client": [
