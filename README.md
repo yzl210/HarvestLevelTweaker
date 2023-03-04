@@ -19,15 +19,16 @@ Create a datapack and add the block to block tag `hltweaker:needs_<level id>_too
 
 ## Override Item Harvest Level and Harvest Type
 Override item harvest level and type in mod config `hltweaker-common.toml` <br>
-Format: `<item id>,<mineable tag>+<maybe another mineable tag>+,<namespace and level id>` <br> 
+Format: `<item id>,<mineable tag>+<maybe another mineable tag>,<namespace and level id>` <br> 
 Example: `minecraft:wooden_pickaxe,minecraft:mineable/pickaxe+minecraft:mineable/axe+minecraft:mineable/shovel,minecraft:netherite` <br>
-If the level is from vanilla, use minecraft as namespace, otherwise use `hltweaker`
+This means setting the harvest level for wooden pickaxe to netherite and it can be used as pickaxe, axe, and shovel (Although mining speed doesn't increase) <br>
+If the level is from vanilla, use `minecraft` as namespace, otherwise use `hltweaker`
 
 ## Set Tinker's Construct Material Level
 In your datapack for tinker's construct, set the harvest level of the material to `hltweaker:<level id>`
 
 ## Localization
-Translation key for harvest level is `text.hltweaker.level.<level id>`
+Translation key for harvest level is `text.hltweaker.level.<level id>` <br>
 Translation key for tool type is `text.hltweaker.tool.<mod namespace>.<tool type>`
 
 ## Modify Vanilla Level Names

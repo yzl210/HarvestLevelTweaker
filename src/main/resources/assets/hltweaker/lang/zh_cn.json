@@ -1,12 +1,12 @@
 {
   "text.hltweaker.level": "等级",
   "text.hltweaker.unknown_level": "未知",
-  "text.hltweaker.level.minecraft.wood": "木",
-  "text.hltweaker.level.minecraft.gold": "金",
-  "text.hltweaker.level.minecraft.stone": "石头",
-  "text.hltweaker.level.minecraft.iron": "铁",
-  "text.hltweaker.level.minecraft.diamond": "钻石",
-  "text.hltweaker.level.minecraft.netherite": "下界合金",
+  "text.hltweaker.level.default_minecraft.wood": "木",
+  "text.hltweaker.level.default_minecraft.gold": "金",
+  "text.hltweaker.level.default_minecraft.stone": "石头",
+  "text.hltweaker.level.default_minecraft.iron": "铁",
+  "text.hltweaker.level.default_minecraft.diamond": "钻石",
+  "text.hltweaker.level.default_minecraft.netherite": "下界合金",
 
   "text.hltweaker.tool.minecraft.axe": "斧",
   "text.hltweaker.tool.minecraft.hoe": "锄",

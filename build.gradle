@@ -16,14 +16,12 @@ plugins {
 }
 
 apply plugin: 'org.spongepowered.mixin'
-System.out.println(Os.OS_NAME)
-System.out.println(Os.OS_ARCH)
 if(Os.OS_NAME.contains("mac") && Os.OS_ARCH.contains("aarch"))
     apply from: "https://moddingtutorials.org/applesilicon.gradle"
 
 
 group = 'cn.leomc'
-version = '1.0'
+version = '1.1'
 
 java {
     archivesBaseName = 'harvestleveltweaker'

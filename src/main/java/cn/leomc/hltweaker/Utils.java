@@ -12,19 +12,23 @@ import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.TierSortingRegistry;
 
-import java.util.AbstractList;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
 
-    public final static ListView<Tier> TIERS = new ListView<>(List.of(Tiers.values()), HLTConfig.getLevelsList());
+    public final static List<Tier> TIERS = new ArrayList<>();
+    static {
+        TIERS.addAll(List.of(Tiers.values()));
+        TIERS.addAll(HLTConfig.getLevelsList());
+    }
 
     public static Tier getHarvestLevel(BlockState state) {
-        for (Tier tier : TIERS) {
+        if(!state.requiresCorrectToolForDrops())
+            return null;
+        for (Tier tier : TIERS)
             if (TierSortingRegistry.isCorrectTierForDrops(tier, state))
                 return tier;
-        }
         return null;
     }
 
@@ -53,37 +57,9 @@ public class Utils {
             ResourceLocation rl = TierSortingRegistry.getName(tier);
             if (rl == null)
                 return new TextComponent(String.valueOf(tier.getLevel()));
+            if(!HLTConfig.isCustomVanillaLevelNamesEnabled() && rl.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
+                return new TranslatableComponent("text.hltweaker.level." + "default_" + rl.getNamespace() + "." + rl.getPath());
             return new TranslatableComponent("text.hltweaker.level." + rl.getNamespace() + "." + rl.getPath());
         }
     }
-
-    private static class ListView<T> extends AbstractList<T> {
-
-        private final List<? extends T>[] lists;
-        private final int size;
-
-        @SafeVarargs
-        public ListView(List<? extends T>... lists) {
-            this.lists = lists;
-            this.size = Arrays.stream(lists).mapToInt(List::size).sum();
-        }
-
-        @Override
-        public T get(int index) {
-            int i = index;
-            for (List<? extends T> list : lists) {
-                if (i >= list.size())
-                    i -= list.size();
-                else
-                    return list.get(index);
-            }
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        }
-
-        @Override
-        public int size() {
-            return size;
-        }
-    }
-
 }
