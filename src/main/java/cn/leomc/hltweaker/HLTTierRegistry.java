@@ -41,10 +41,6 @@ public class HLTTierRegistry {
     }
 
 
-    public static Component formatTierName(HLTTier tier) {
-        return tier.getNameComponent();
-    }
-
     private static MutableComponent replace(String original, List<Pair<String, Component>> replacements) {
         String[] split = null;
         Component replacement = null;

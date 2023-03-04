@@ -5,6 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "hltweaker.refmap.json",
   "mixins": [
+    "DiggerItemMixin",
+    "ItemMixin",
     "TiCHarvestTiersMixin",
     "TOPHarvestInfoToolsMixin"
   ],

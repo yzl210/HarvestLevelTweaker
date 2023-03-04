@@ -1,3 +1,4 @@
+import org.codehaus.plexus.util.Os
 
 buildscript {
     repositories {
@@ -15,7 +16,11 @@ plugins {
 }
 
 apply plugin: 'org.spongepowered.mixin'
-apply from: "https://moddingtutorials.org/applesilicon.gradle"
+System.out.println(Os.OS_NAME)
+System.out.println(Os.OS_ARCH)
+if(Os.OS_NAME.contains("mac") && Os.OS_ARCH.contains("aarch"))
+    apply from: "https://moddingtutorials.org/applesilicon.gradle"
+
 
 group = 'cn.leomc'
 version = '1.0'

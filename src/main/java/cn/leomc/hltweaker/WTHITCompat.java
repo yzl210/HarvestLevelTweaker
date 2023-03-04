@@ -7,6 +7,6 @@ import squeek.wthitharvestability.helpers.StringHelper;
 @OnlyIn(Dist.CLIENT)
 public class WTHITCompat {
     public static void apply() {
-        StringHelper.TIER_NAME_GETTERS.add(t -> t instanceof HLTTier hltTier ? HLTTierRegistry.formatTierName(hltTier).getString() : null);
+        StringHelper.TIER_NAME_GETTERS.add(t -> t instanceof HLTTier hltTier ? Utils.getTierName(hltTier).getString() : null);
     }
 }

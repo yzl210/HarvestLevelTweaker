@@ -23,9 +23,8 @@ public class HLTCommand {
 
     private static int showLevels(CommandContext<CommandSourceStack> context) {
         context.getSource().sendSuccess(new TextComponent(Arrays.toString(TierSortingRegistry.getSortedTiers().toArray())), false);
-        if(context.getSource().getEntity() instanceof Player player)
+        if (context.getSource().getEntity() instanceof Player player)
             player.sendMessage(new TextComponent(player.getMainHandItem().getItem().getClass().getName()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
-
 }

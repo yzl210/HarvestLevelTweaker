@@ -18,8 +18,8 @@ public class TiCHarvestTiersMixin {
             cancellable = true,
             remap = false
     )
-    private static void onGetName(Tier tier, CallbackInfoReturnable<Component> cir){
-        if(tier instanceof HLTTier hltTier)
+    private static void onGetName(Tier tier, CallbackInfoReturnable<Component> cir) {
+        if (tier instanceof HLTTier hltTier)
             cir.setReturnValue(hltTier.getNameComponent());
     }
 

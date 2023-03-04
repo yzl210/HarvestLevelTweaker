@@ -1,6 +1,19 @@
 {
   "text.hltweaker.level": "等级",
   "text.hltweaker.unknown_level": "未知",
+  "text.hltweaker.level.minecraft.wood": "木",
+  "text.hltweaker.level.minecraft.gold": "金",
+  "text.hltweaker.level.minecraft.stone": "石头",
+  "text.hltweaker.level.minecraft.iron": "铁",
+  "text.hltweaker.level.minecraft.diamond": "钻石",
+  "text.hltweaker.level.minecraft.netherite": "下界合金",
 
-  "tooltip.hltweaker.harvest_level": "挖掘等级: %s"
+  "text.hltweaker.tool.minecraft.axe": "斧",
+  "text.hltweaker.tool.minecraft.hoe": "锄",
+  "text.hltweaker.tool.minecraft.pickaxe": "镐",
+  "text.hltweaker.tool.minecraft.shovel": "锹",
+
+  "tooltip.hltweaker.harvest_level": "采掘等级: %s",
+  "tooltip.hltweaker.tool_type": "工具类型: %s",
+  "tooltip.hltweaker.block_harvest_level": "方块采掘等级: %s"
 }
