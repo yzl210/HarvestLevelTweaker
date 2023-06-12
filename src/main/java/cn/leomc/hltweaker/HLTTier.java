@@ -1,7 +1,6 @@
 package cn.leomc.hltweaker;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -25,7 +24,7 @@ public class HLTTier implements Tier {
         this.level = level;
         this.romanLevel = toRoman(level);
         this.tag = BlockTags.create(new ResourceLocation(HarvestLevelTweaker.MOD_ID, "needs_" + id + "_tool"));
-        this.name = new TranslatableComponent("text.hltweaker.level." + id);
+        this.name = Component.translatable("text.hltweaker.level." + id);
     }
 
     private static String toRoman(int number) {

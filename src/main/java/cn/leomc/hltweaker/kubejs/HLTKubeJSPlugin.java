@@ -5,8 +5,9 @@ import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
 
 public class HLTKubeJSPlugin extends KubeJSPlugin {
+
     @Override
-    public void addClasses(ScriptType type, ClassFilter filter) {
+    public void registerClasses(ScriptType type, ClassFilter filter) {
         filter.allow("cn.leomc.hltweaker.HLTTierRegistry");
     }
 }

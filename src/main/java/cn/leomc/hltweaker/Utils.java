@@ -2,8 +2,6 @@ package cn.leomc.hltweaker;
 
 import cn.leomc.hltweaker.config.HLTConfig;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -11,6 +9,7 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.TierSortingRegistry;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +32,11 @@ public class Utils {
     }
 
     public static boolean isItemOverridden(Item item) {
-        return HLTConfig.getItemOverrides().containsKey(item.getRegistryName());
+        return HLTConfig.getItemOverrides().containsKey(ForgeRegistries.ITEMS.getKey(item));
     }
 
     public static boolean checkItemOverrides(Item item, BlockState state) {
-        ResourceLocation rl = item.getRegistryName();
+        ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
         return isItemOverridden(item)
                 && HLTConfig.getItemOverrides().get(rl).left().stream().anyMatch(state::is)
                 && TierSortingRegistry
@@ -56,10 +55,10 @@ public class Utils {
         else {
             ResourceLocation rl = TierSortingRegistry.getName(tier);
             if (rl == null)
-                return new TextComponent(String.valueOf(tier.getLevel()));
+                return Component.literal(String.valueOf(tier.getLevel()));
             if(!HLTConfig.isCustomVanillaLevelNamesEnabled() && rl.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE))
-                return new TranslatableComponent("text.hltweaker.level." + "default_" + rl.getNamespace() + "." + rl.getPath());
-            return new TranslatableComponent("text.hltweaker.level." + rl.getNamespace() + "." + rl.getPath());
+                return Component.translatable("text.hltweaker.level." + "default_" + rl.getNamespace() + "." + rl.getPath());
+            return Component.translatable("text.hltweaker.level." + rl.getNamespace() + "." + rl.getPath());
         }
     }
 }

@@ -4,18 +4,11 @@ import cn.leomc.hltweaker.Utils;
 import cn.leomc.hltweaker.config.HLTConfig;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.config.IPluginConfig;
-import mcp.mobius.waila.api.ui.IElement;
-import mcp.mobius.waila.api.ui.IElementHelper;
-import mcp.mobius.waila.impl.ui.SubTextElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tier;
@@ -31,6 +24,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import snownee.jade.addon.harvest.HarvestToolProvider;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.IElement;
+import snownee.jade.api.ui.IElementHelper;
+import snownee.jade.impl.ui.SubTextElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,13 +78,13 @@ public class JadeHarvestToolProviderMixin {
         elements.add(helper.spacer(5, 0));
 
         String unknownLevel = I18n.get("text.hltweaker.level");
-        elements.add(new SubTextElement(new TextComponent(unknownLevel))
+        elements.add(new SubTextElement(Component.literal(unknownLevel))
                 .translate(new Vec2(-1, -2)));
 
 
         Tier tier = Utils.getHarvestLevel(accessor.getBlockState());
         String s = tier == null ? I18n.get("text.hltweaker.unknown_level") : Utils.getTierName(tier).getString();
-        elements.add(new SubTextElement(new TextComponent(s))
+        elements.add(new SubTextElement(Component.literal(s))
                 .translate(new Vec2(-1, 4)));
 
         elements.add(helper.spacer((int) (Math.max(Minecraft.getInstance().font.width(s), Minecraft.getInstance().font.width(unknownLevel)) * 0.75), 0));

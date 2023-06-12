@@ -5,9 +5,8 @@ import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.providers.HarvestInfoTools;
 import mcjty.theoneprobe.config.Config;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -68,12 +67,12 @@ public abstract class TOPHarvestInfoToolsMixin {
                 horizontal.icon(ICONS, 16, offs, dim, dim, iconStyle)
                         .text(CompoundText.create().style(TextStyleClass.WARNING).text((tools.isEmpty() ? "No tool" : tools)));
             else {
-                MutableComponent component = new TextComponent(tools.isEmpty() ? "No tool" : tools);
+                MutableComponent component = Component.literal(tools.isEmpty() ? "No tool" : tools);
                 if(blockState.requiresCorrectToolForDrops()) {
                     component.append(" (");
-                    component.append(new TranslatableComponent("text.hltweaker.level"));
+                    component.append(Component.translatable("text.hltweaker.level"));
                     component.append(" ");
-                    component.append(tier == null ? new TextComponent(levels) : Utils.getTierName(tier));
+                    component.append(tier == null ? Component.literal(levels) : Utils.getTierName(tier));
                     component.append(")");
                 }
 

@@ -4,7 +4,6 @@ import cn.leomc.hltweaker.config.HLTConfig;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -53,7 +52,7 @@ public class HLTTierRegistry {
             }
         }
         if (split == null)
-            return new TextComponent(original);
+            return Component.literal(original);
 
         MutableComponent left = replace(split[0], replacements);
         left.append(replacement);

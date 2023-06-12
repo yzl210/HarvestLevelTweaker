@@ -1,4 +1,4 @@
-package cn.leomc.hltweaker.mixin;
+/*package cn.leomc.hltweaker.mixin;
 
 import cn.leomc.hltweaker.HLTTier;
 import net.minecraft.network.chat.Component;
@@ -24,3 +24,4 @@ public class TiCHarvestTiersMixin {
     }
 
 }
+*/
