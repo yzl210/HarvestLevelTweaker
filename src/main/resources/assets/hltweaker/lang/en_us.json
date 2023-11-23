@@ -1,19 +1,18 @@
 {
   "text.hltweaker.level": "Level",
   "text.hltweaker.unknown_level": "Unknown",
-  "text.hltweaker.level.default_minecraft.wood": "Wood",
-  "text.hltweaker.level.default_minecraft.gold": "Gold",
-  "text.hltweaker.level.default_minecraft.stone": "Stone",
-  "text.hltweaker.level.default_minecraft.iron": "Iron",
-  "text.hltweaker.level.default_minecraft.diamond": "Diamond",
-  "text.hltweaker.level.default_minecraft.netherite": "Netherite",
+  "text.hltweaker.level.minecraft.wood": "Wood",
+  "text.hltweaker.level.minecraft.gold": "Gold",
+  "text.hltweaker.level.minecraft.stone": "Stone",
+  "text.hltweaker.level.minecraft.iron": "Iron",
+  "text.hltweaker.level.minecraft.diamond": "Diamond",
+  "text.hltweaker.level.minecraft.netherite": "Netherite",
 
   "text.hltweaker.tool.minecraft.axe": "Axe",
   "text.hltweaker.tool.minecraft.hoe": "Hoe",
   "text.hltweaker.tool.minecraft.pickaxe": "Pickaxe",
   "text.hltweaker.tool.minecraft.shovel": "Shovel",
 
-  "tooltip.hltweaker.harvest_level": "Harvest Level: %s",
-  "tooltip.hltweaker.tool_type": "Tool Type: %s",
+  "tooltip.hltweaker.tool_type_level": "%s: %s",
   "tooltip.hltweaker.block_harvest_level": "Block Harvest Level: %s"
 }

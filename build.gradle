@@ -1,5 +1,3 @@
-import org.codehaus.plexus.util.Os
-
 buildscript {
     repositories {
         // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
@@ -12,21 +10,21 @@ buildscript {
 }
 
 plugins {
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'net.neoforged.gradle' version '[6.0.18,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+
 }
-
-apply plugin: 'org.spongepowered.mixin'
-if(Os.OS_NAME.contains("mac") && Os.OS_ARCH.contains("aarch"))
-    apply from: "https://moddingtutorials.org/applesilicon.gradle"
-
 
 group = 'cn.leomc'
-version = '1.1'
+version = '1.2.0'
 
-java {
-    archivesBaseName = 'harvestleveltweaker'
-    toolchain.languageVersion = JavaLanguageVersion.of(17)
+base {
+    archivesName = 'harvestleveltweaker'
 }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
 
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
@@ -42,7 +40,7 @@ minecraft {
     //
     // Use non-default mappings at your own risk. They may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.19.2'
+    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -148,7 +146,7 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-    maven { url "https://maven.bai.lol" }
+    maven { url "https://maven2.bai.lol" }
     maven {
         // Shedaniel's maven (Architectury API)
         url = "https://maven.architectury.dev"
@@ -173,7 +171,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.2-43.2.14'
+    minecraft 'net.neoforged:forge:1.20.1-47.1.79'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -197,14 +195,10 @@ dependencies {
 
 
     compileOnly fg.deobf("mcp.mobius.waila:wthit:forge-${wthit_version}") {transitive false}
-    //runtimeOnly fg.deobf("mcp.mobius.waila:wthit:forge-${wthit_version}") {transitive false}
-    //runtimeOnly fg.deobf("lol.bai:badpackets:forge-0.2.1") {transitive false}
-    compileOnly fg.deobf("curse.maven:wthitharvestability-666621:3960144") {transitive false}
-    //runtimeOnly fg.deobf("curse.maven:wthitharvestability-666621:3960144") {transitive false}
-
-    implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}") {transitive false}
-    implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}") {transitive false}
-    implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}") {transitive false}
+    runtimeOnly fg.deobf("mcp.mobius.waila:wthit:forge-${wthit_version}") {transitive false}
+    runtimeOnly fg.deobf("curse.maven:badpackets-615134:4784395") {transitive false}
+    compileOnly fg.deobf("curse.maven:wthitharvestability-666621:4759296") {transitive false}
+    runtimeOnly fg.deobf("curse.maven:wthitharvestability-666621:4759296") {transitive false}
 
     //implementation fg.deobf("slimeknights.mantle:Mantle:${mc_version}-${mantle_version}")
     //implementation fg.deobf("slimeknights.tconstruct:TConstruct:${mc_version}-${tconstruct_version}")

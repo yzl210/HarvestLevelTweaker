@@ -1,118 +1,73 @@
 package cn.leomc.hltweaker.config;
 
-import cn.leomc.hltweaker.HLTTier;
-import cn.leomc.hltweaker.HarvestLevelTweaker;
+import cn.leomc.hltweaker.Utils;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.google.common.collect.Lists;
-import it.unimi.dsi.fastutil.Pair;
-import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
-import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Tier;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.Builder;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.*;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class HLTConfig {
 
-    public static final ForgeConfigSpec COMMON_CONFIG;
-    private static final Builder COMMON_BUILDER = new Builder();
-    private static final ConfigValue<List<? extends String>> HARVEST_LEVELS;
-    private static final ConfigValue<List<? extends String>> ITEM_HARVEST_LEVEL_OVERRIDES;
-    private static final ForgeConfigSpec.BooleanValue ENABLE_CUSTOM_VANILLA_LEVEL_NAMES;
+    public static final ForgeConfigSpec CLIENT_CONFIG;
+    private static final Builder CLIENT_BUILDER = new Builder();
+    private static final ForgeConfigSpec.BooleanValue SHOW_HARVEST_LEVEL_NAME;
+    private static final ForgeConfigSpec.BooleanValue SHOW_TOOL_HARVEST_LEVEL;
+    private static final ForgeConfigSpec.BooleanValue SHOW_BLOCK_HARVEST_LEVEL;
+    private static final Map<String, ForgeConfigSpec.ConfigValue<String>> VANILLA_LEVEL_COLORS = new LinkedHashMap<>();
 
-    private static Map<Integer, HLTTier> harvest_levels;
-    private static List<HLTTier> harvest_levels_list;
-    private static List<HLTTier> reversed_harvest_levels_list;
-
-    private static Map<ResourceLocation, Pair<List<TagKey<Block>>, Tier>> item_harvest_level_overrides;
+    private static final Map<String, String> DEFAULT_COLORS = Map.of(
+            "WOOD", "#8b5a2b",
+            "STONE", "#808080",
+            "IRON", "#cecaca",
+            "DIAMOND", "#2cbaa8",
+            "GOLD", "#ecd93f",
+            "NETHERITE", "#443a3b"
+    );
 
     static {
-        HARVEST_LEVELS = COMMON_BUILDER
-                .comment("Define new harvest levels here, \"<id>,<level>\" (level start from 5, 0-4 are vanilla levels), example: \"cobalt,5")
-                .defineList("harvest_levels", List.of(), s -> s instanceof String);
-        ITEM_HARVEST_LEVEL_OVERRIDES = COMMON_BUILDER
-                .comment("Override item harvest level and tool type here, \"<item id>,<mineable tag>+<another mineable tag>,<level id>\", example: \"minecraft:wooden_pickaxe,minecraft:mineable/pickaxe+minecraft:mineable/axe+minecraft:mineable/shovel,minecraft:netherite\"")
-                .defineList("item_harvest_level_overrides", List.of(), s -> s instanceof String);
-        ENABLE_CUSTOM_VANILLA_LEVEL_NAMES = COMMON_BUILDER
-                .comment("Enable custom name support for vanilla levels")
-                .define("enable_custom_vanilla_names", false);
-        COMMON_CONFIG = COMMON_BUILDER.build();
+        SHOW_HARVEST_LEVEL_NAME = CLIENT_BUILDER
+                .comment("Show harvest level name next to the tool icon")
+                .define("show_harvest_level_name", true);
+        SHOW_BLOCK_HARVEST_LEVEL = CLIENT_BUILDER
+                .comment("Show block required harvest level in tooltips when shift is held or advanced tooltips are enabled")
+                .define("show_block_harvest_levels", true);
+        SHOW_TOOL_HARVEST_LEVEL = CLIENT_BUILDER
+                .comment("Show tool harvest level in tooltips when shift is held or advanced tooltips are enabled")
+                .define("show_tool_harvest_levels", true);
+
+        CLIENT_BUILDER.comment("Colors for vanilla harvest levels, in hex format or color name");
+        CLIENT_BUILDER.push("vanilla_level_colors");
+        DEFAULT_COLORS.forEach((key, value) -> VANILLA_LEVEL_COLORS.put(key, CLIENT_BUILDER.define(key, value)));
+        CLIENT_BUILDER.pop();
+
+        CLIENT_CONFIG = CLIENT_BUILDER.build();
     }
 
-
-    public static void loadLevels() {
-        harvest_levels = new Int2ObjectRBTreeMap<>();
-        for (String s : HARVEST_LEVELS.get()) {
-            String[] split = s.split(",");
-            HLTTier tier = new HLTTier(split[0], Integer.parseInt(split[1]));
-            harvest_levels.put(tier.getLevel(), tier);
-        }
-        HLTTier last = null;
-        for (HLTTier tier : harvest_levels.values()) {
-            TierSortingRegistry.registerTier(tier, tier.getId(), List.of(last == null ? Tiers.NETHERITE : last), Collections.emptyList());
-            last = tier;
-        }
-        harvest_levels_list = new ArrayList<>(harvest_levels.values());
-        reversed_harvest_levels_list = Lists.reverse(harvest_levels_list);
-        HarvestLevelTweaker.LOGGER.info("Loaded Levels " + harvest_levels);
+    public static boolean showHarvestLevelName() {
+        return SHOW_HARVEST_LEVEL_NAME.get();
     }
 
-    public static void loadOverrides() {
-        item_harvest_level_overrides = new HashMap<>();
-        for (String s : ITEM_HARVEST_LEVEL_OVERRIDES.get()) {
-            String[] split = s.split(",");
-            List<TagKey<Block>> tags = new ArrayList<>();
-            for (String tag : split[1].split("\\+"))
-                tags.add(TagKey.create(ForgeRegistries.Keys.BLOCKS, new ResourceLocation(tag)));
-            item_harvest_level_overrides.put(new ResourceLocation(split[0]),
-                    ObjectObjectImmutablePair.of(tags, TierSortingRegistry.byName(new ResourceLocation(split[2]))));
-        }
-        HarvestLevelTweaker.LOGGER.info("Loaded overrides " + item_harvest_level_overrides);
+    public static boolean showToolHarvestLevel() {
+        return SHOW_TOOL_HARVEST_LEVEL.get();
     }
 
-    public static Map<Integer, HLTTier> getHarvestLevels() {
-        if (harvest_levels == null)
-            loadLevels();
-        return harvest_levels;
+    public static boolean showBlockHarvestLevel() {
+        return SHOW_BLOCK_HARVEST_LEVEL.get();
     }
 
-    public static List<HLTTier> getLevelsList() {
-        if (harvest_levels_list == null)
-            loadLevels();
-        return harvest_levels_list;
+    public static TextColor getColor(Tiers tier) {
+        return TextColor.parseColor(VANILLA_LEVEL_COLORS.get(tier.name()).get());
     }
 
-    public static List<HLTTier> getReversedLevelsList() {
-        if (reversed_harvest_levels_list == null)
-            loadLevels();
-        return reversed_harvest_levels_list;
+    public static void loadConfig(Path path) {
+        CommentedFileConfig clientConfig = CommentedFileConfig.builder(path.resolve("client.toml")).build();
+        clientConfig.load();
+        CLIENT_CONFIG.setConfig(clientConfig);
+        Utils.clearCache();
     }
-
-    public static Map<ResourceLocation, Pair<List<TagKey<Block>>, Tier>> getItemOverrides() {
-        if (item_harvest_level_overrides == null)
-            loadOverrides();
-        return item_harvest_level_overrides;
-    }
-
-    public static boolean isCustomVanillaLevelNamesEnabled() {
-        return ENABLE_CUSTOM_VANILLA_LEVEL_NAMES.get();
-    }
-
-    public static void loadConfig() {
-        CommentedFileConfig config = CommentedFileConfig
-                .builder(FMLPaths.CONFIGDIR.get().resolve(HarvestLevelTweaker.MOD_ID + "-common.toml")).build();
-        config.load();
-        COMMON_CONFIG.setConfig(config);
-        loadLevels();
-    }
-
 }
