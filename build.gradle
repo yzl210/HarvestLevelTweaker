@@ -17,10 +17,10 @@ plugins {
 }
 
 group = 'cn.leomc'
-version = '1.2.0'
+version = '1.2.1'
 
 base {
-    archivesName = 'harvestleveltweaker'
+    archivesName = "harvestleveltweaker-${mc_version}"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)

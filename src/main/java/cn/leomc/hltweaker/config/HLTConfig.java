@@ -7,6 +7,8 @@ import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.Builder;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,6 +67,14 @@ public class HLTConfig {
     }
 
     public static void loadConfig(Path path) {
+        try {
+            if (Files.exists(path) && !Files.isDirectory(path))
+                Files.delete(path);
+            if (!Files.exists(path))
+                Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create config file", e);
+        }
         CommentedFileConfig clientConfig = CommentedFileConfig.builder(path.resolve("client.toml")).build();
         clientConfig.load();
         CLIENT_CONFIG.setConfig(clientConfig);
