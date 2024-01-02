@@ -118,6 +118,10 @@ More details can be found in the config file.
 `/hltweaker levels all` - Show all harvest levels that are registered in the game <br>
 `/hltweaker overrides` - Show item harvest level overrides <br>
 
+## Set Tinker's Construct Material Level (1.18 Only)
+In your datapack for tinker's construct, set the harvest level of the material to `hltweaker:<level id>`
+
+
 [1]: http://cf.way2muchnoise.eu/full_833035_downloads.svg
 [2]: http://cf.way2muchnoise.eu/versions/833035_all.svg
 [3]: https://www.curseforge.com/minecraft/mc-mods/harvest-level-tweaker
