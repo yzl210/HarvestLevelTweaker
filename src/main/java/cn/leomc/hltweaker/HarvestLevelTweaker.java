@@ -6,10 +6,13 @@ import cn.leomc.hltweaker.config.ItemHarvestLevelOverride;
 import cn.leomc.hltweaker.mixin.DiggerItemAccessor;
 import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Tier;
@@ -18,8 +21,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.TierSortingRegistry;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -57,8 +63,12 @@ public class HarvestLevelTweaker {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onFMLCommonSetup);
 
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
-        if (FMLLoader.getDist().isClient())
+        MinecraftForge.EVENT_BUS.addListener(this::onAddReloadListener);
+        if (FMLLoader.getDist().isClient()) {
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onRegisterClientReloadListeners);
+            MinecraftForge.EVENT_BUS.addListener(this::onJoinServer);
             MinecraftForge.EVENT_BUS.addListener(this::onItemTooltip);
+        }
     }
 
     private void onFMLCommonSetup(FMLCommonSetupEvent event) {
@@ -67,10 +77,10 @@ public class HarvestLevelTweaker {
 
     @OnlyIn(Dist.CLIENT)
     private void onItemTooltip(ItemTooltipEvent event) {
-        if (!event.getFlags().isAdvanced() && !Screen.hasShiftDown())
-            return;
+        boolean advanced = event.getFlags().isAdvanced();
+        boolean populating = event.getEntity() == null;
 
-        if (event.getEntity() == null || HLTConfig.showToolHarvestLevel()) {
+        if (HLTConfig.toolHarvestLevelDisplayMode().shouldShow(advanced, populating)) {
             Map<TagKey<Block>, Tier> map = new HashMap<>();
             if (event.getItemStack().getItem() instanceof DiggerItem item && item instanceof DiggerItemAccessor accessor) {
                 Tier tier = item.getTier();
@@ -104,12 +114,36 @@ public class HarvestLevelTweaker {
             }
         }
 
-        if ((event.getEntity() == null || HLTConfig.showBlockHarvestLevel()) && event.getItemStack().getItem() instanceof BlockItem item) {
+        if (HLTConfig.blockHarvestLevelDisplayMode().shouldShow(advanced, populating) && event.getItemStack().getItem() instanceof BlockItem item) {
             BlockState state = item.getBlock().defaultBlockState();
             if (state.requiresCorrectToolForDrops())
                 event.getToolTip().add(Component.translatable("tooltip.hltweaker.block_harvest_level", Utils.getTierName(Utils.getHarvestLevel(state)))
                         .withStyle(ChatFormatting.YELLOW));
         }
+    }
+
+    private final PreparableReloadListener cacheClearer = new SimplePreparableReloadListener<Void>() {
+        @Override
+        protected Void prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+            return null;
+        }
+
+        @Override
+        protected void apply(Void pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+            Utils.clearCache();
+        }
+    };
+
+    private void onAddReloadListener(AddReloadListenerEvent event) {
+        event.addListener(cacheClearer);
+    }
+
+    private void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(cacheClearer);
+    }
+
+    private void onJoinServer(ClientPlayerNetworkEvent.LoggingIn event) {
+        Utils.clearCache();
     }
 
     private void onRegisterCommands(RegisterCommandsEvent event) {
