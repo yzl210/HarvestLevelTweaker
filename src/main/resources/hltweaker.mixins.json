@@ -5,12 +5,14 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "hltweaker.refmap.json",
   "mixins": [
+    "DiggerItemAccessor",
     "DiggerItemMixin",
     "ItemMixin",
     "TOPHarvestInfoToolsMixin"
   ],
   "client": [
-    "JadeHarvestToolProviderMixin"
+    "JadeHarvestToolProviderMixin",
+    "WTHITWailaHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

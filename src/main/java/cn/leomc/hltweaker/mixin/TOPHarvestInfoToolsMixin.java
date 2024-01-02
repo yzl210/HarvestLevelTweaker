@@ -5,11 +5,8 @@ import mcjty.theoneprobe.api.*;
 import mcjty.theoneprobe.apiimpl.providers.HarvestInfoTools;
 import mcjty.theoneprobe.config.Config;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -46,7 +43,6 @@ public abstract class TOPHarvestInfoToolsMixin {
     )
     private static void showHarvestInfo(IProbeInfo probeInfo, Level world, BlockPos pos, Block block, BlockState blockState, Player player, CallbackInfo info) {
         info.cancel();
-        ItemStack stack = player.getMainHandItem();
         boolean harvestable = Utils.canHarvestBlock(blockState, player);
         String tools = getTools(blockState);
         Tier tier = Utils.getHarvestLevel(blockState);
@@ -65,21 +61,27 @@ public abstract class TOPHarvestInfoToolsMixin {
         } else {
             if (levels.isEmpty() && tier == null)
                 horizontal.icon(ICONS, 16, offs, dim, dim, iconStyle)
-                        .text(CompoundText.create().style(TextStyleClass.WARNING).text((tools.isEmpty() ? "No tool" : tools)));
+                        .text(warning(tools.isEmpty() ? "No tool" : tools));
             else {
-                MutableComponent component = Component.literal(tools.isEmpty() ? "No tool" : tools);
-                if(blockState.requiresCorrectToolForDrops()) {
-                    component.append(" (");
-                    component.append(Component.translatable("text.hltweaker.level"));
-                    component.append(" ");
-                    component.append(tier == null ? Component.literal(levels) : Utils.getTierName(tier));
-                    component.append(")");
+                horizontal.icon(ICONS, 16, offs, dim, dim, iconStyle);
+
+                horizontal.text(warning(tools.isEmpty() ? "No tool" : tools));
+                if (blockState.requiresCorrectToolForDrops()) {
+                    horizontal.text(warning(" ("));
+                    horizontal.text(CompoundText.create().warning("text.hltweaker.level"));
+                    horizontal.text(" ");
+                    if (tier == null)
+                        horizontal.text(warning(levels));
+                    else
+                        horizontal.mcText(Utils.getTierName(tier));
+                    horizontal.text(warning(")"));
                 }
 
-                horizontal.icon(ICONS, 16, offs, dim, dim, iconStyle)
-                        .text(CompoundText.create().style(TextStyleClass.WARNING)
-                                .text(component));
             }
         }
+    }
+
+    private static CompoundText warning(String text) {
+        return CompoundText.create().style(TextStyleClass.WARNING).text(text);
     }
 }
