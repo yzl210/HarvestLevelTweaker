@@ -34,18 +34,22 @@ public class Utils {
     private static final Map<BlockState, Tier> HARVEST_LEVEL_CACHE = new HashMap<>();
     private static final Table<Item, BlockState, Boolean> ITEM_OVERRIDE_CACHE = HashBasedTable.create();
     private static final Map<Tier, MutableComponent> TIER_NAME_CACHE = new HashMap<>();
+    private static final Map<Tier, TextColor> TIER_COLOR_CACHE = new HashMap<>();
 
     public static void clearCache() {
         TIER_NAME_CACHE.clear();
         ITEM_OVERRIDE_CACHE.clear();
         HARVEST_LEVEL_CACHE.clear();
+        TIER_COLOR_CACHE.clear();
     }
 
     public static List<Tier> getTiers() {
-        return new ImmutableList.Builder<Tier>()
-                .add(Tiers.values())
-                .addAll(HarvestLevelTweaker.getManager().getTiers())
-                .build();
+        if (!HLTConfig.showClosestLowerVanillaHLTLevel())
+            return TierSortingRegistry.getSortedTiers();
+
+        return TierSortingRegistry.getSortedTiers().stream()
+                .filter(tier -> tier instanceof Tiers || tier instanceof HLTTier)
+                .toList();
     }
 
     public static Tier getHarvestLevel(BlockState state) {
@@ -72,11 +76,13 @@ public class Utils {
 
         ItemHarvestLevelOverride override = HarvestLevelTweaker.getManager().getOverride(rl);
 
-        for (TagKey<Block> tag : override.mineableTags())
-            if (state.is(tag) && TierSortingRegistry.isCorrectTierForDrops(override.getTier(tag), state)) {
+        for (TagKey<Block> tag : override.mineableTags()) {
+            Tier tier = override.getTier(tag);
+            if (tier != null && state.is(tag) && TierSortingRegistry.isCorrectTierForDrops(tier, state)) {
                 ITEM_OVERRIDE_CACHE.put(item, state, true);
                 return true;
             }
+        }
         ITEM_OVERRIDE_CACHE.put(item, state, false);
         return false;
     }
@@ -89,6 +95,9 @@ public class Utils {
     }
 
     public static MutableComponent getTierName(Tier tier) {
+        if (tier == null)
+            return Component.literal("null");
+
         return TIER_NAME_CACHE.computeIfAbsent(tier, t -> {
             if (tier instanceof HLTTier hltTier)
                 return hltTier.getName();
@@ -102,11 +111,19 @@ public class Utils {
     }
 
     public static TextColor getTierColor(Tier tier) {
-        if (tier instanceof HLTTier hltTier)
-            return hltTier.getColor();
-        if (tier instanceof Tiers tiers)
-            return HLTConfig.getColor(tiers);
-        return TextColor.fromLegacyFormat(ChatFormatting.WHITE);
+        return TIER_COLOR_CACHE.computeIfAbsent(tier, t -> {
+            if (tier instanceof HLTTier hltTier)
+                return hltTier.getColor();
+            if (tier instanceof Tiers tiers)
+                return HLTConfig.getColor(tiers);
+            ResourceLocation id = TierSortingRegistry.getName(tier);
+            if (id != null) {
+                TextColor color = HLTConfig.getColor(id);
+                if (color != null)
+                    return color;
+            }
+            return TextColor.fromLegacyFormat(ChatFormatting.WHITE);
+        });
     }
 
     public static MutableComponent getMineableName(TagKey<Block> mineableTag) {

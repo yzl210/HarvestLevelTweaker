@@ -87,7 +87,7 @@ public class HarvestLevelTweaker {
 
                 if (tier instanceof EquivalentTier t)
                     tier = t.getHLTTier();
-                else if (!(tier instanceof HLTTier || tier instanceof Tiers)) {
+                else if (HLTConfig.showClosestLowerVanillaHLTLevel() && !(tier instanceof HLTTier || tier instanceof Tiers)) {
                     List<Tier> tiers = TierSortingRegistry.getTiersLowerThan(item.getTier())
                             .stream()
                             .filter(t -> t instanceof HLTTier || t instanceof Tiers)
@@ -95,13 +95,17 @@ public class HarvestLevelTweaker {
                     if (!tiers.isEmpty())
                         tier = tiers.get(tiers.size() - 1);
                 }
-
-                map.put(accessor.getBlocks(), tier);
+                if (accessor.getBlocks() != null && tier != null)
+                    map.put(accessor.getBlocks(), tier);
             }
 
             ItemHarvestLevelOverride override = manager.getOverride(ForgeRegistries.ITEMS.getKey(event.getItemStack().getItem()));
             if (override != null)
-                override.mineableTags().forEach(tag -> map.put(tag, override.getTier(tag)));
+                override.mineableTags().forEach(tag -> {
+                    Tier tier = override.getTier(tag);
+                    if (tier != null)
+                        map.put(tag, tier);
+                });
 
 
             if (!map.isEmpty()) {

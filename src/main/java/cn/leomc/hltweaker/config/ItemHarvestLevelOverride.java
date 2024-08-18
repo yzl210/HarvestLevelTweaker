@@ -1,5 +1,6 @@
 package cn.leomc.hltweaker.config;
 
+import cn.leomc.hltweaker.HarvestLevelTweaker;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
@@ -37,6 +38,15 @@ public final class ItemHarvestLevelOverride {
     }
 
     public Tier getTier(TagKey<Block> tag) {
-        return cachedTiers.computeIfAbsent(tag, t -> TierSortingRegistry.byName(overrides.get(t)));
+        if (!overrides.containsKey(tag))
+            return null;
+
+        return cachedTiers.computeIfAbsent(tag, t -> {
+            ResourceLocation tierId = overrides.get(t);
+            Tier tier = TierSortingRegistry.byName(tierId);
+            if (tier == null)
+                HarvestLevelTweaker.LOGGER.warn("Tier {} not found in item override {}", tierId, item);
+            return tier;
+        });
     }
 }

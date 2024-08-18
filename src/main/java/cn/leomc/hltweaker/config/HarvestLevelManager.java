@@ -3,6 +3,7 @@ package cn.leomc.hltweaker.config;
 import cn.leomc.hltweaker.HLTTier;
 import cn.leomc.hltweaker.HarvestLevelTweaker;
 import cn.leomc.hltweaker.Utils;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.ints.*;
@@ -30,6 +31,7 @@ public class HarvestLevelManager {
     }
 
     private final Int2ObjectMap<HLTTier> harvestLevels = new Int2ObjectAVLTreeMap<>();
+    private final List<HLTTier> specialOrderingTiers = new ArrayList<>();
     private final Map<ResourceLocation, ItemHarvestLevelOverride> overrides = new HashMap<>();
 
     public void load() {
@@ -45,8 +47,17 @@ public class HarvestLevelManager {
 
         HLTTier last = null;
         for (HLTTier tier : harvestLevels.values()) {
-            TierSortingRegistry.registerTier(tier, tier.getId(), List.of(last == null ? Tiers.NETHERITE : last), Collections.emptyList());
+            List<Object> worseTiers = new ArrayList<>(tier.getWorseTiers());
+            worseTiers.add(last == null ? Tiers.NETHERITE : last.getId());
+            List<Object> betterTiers = new ArrayList<>(tier.getBetterTiers());
+            TierSortingRegistry.registerTier(tier, tier.getId(), worseTiers, betterTiers);
             last = tier;
+        }
+
+        for (HLTTier tier : specialOrderingTiers) {
+            TierSortingRegistry.registerTier(tier, tier.getId(),
+                    Arrays.asList(tier.getWorseTiers().toArray()),
+                    Arrays.asList(tier.getBetterTiers().toArray()));
         }
 
         Utils.clearCache();
@@ -57,34 +68,60 @@ public class HarvestLevelManager {
         try (Stream<Path> stream = Files.walk(folder, 2)) {
             stream.filter(Files::isRegularFile)
                     .filter(p -> p.getFileName().toString().endsWith(".json"))
-                    .map(this::loadHarvestLevel)
-                    .forEach(tier -> harvestLevels.put(tier.getLevel(), tier));
+                    .forEach(this::loadHarvestLevel);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private HLTTier loadHarvestLevel(Path file) {
+    private void loadHarvestLevel(Path file) {
         try {
             JsonObject object = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
             String id = file.getFileName().toString().replace(".json", "");
             int level = object.get("level").getAsInt();
-            if (harvestLevels.containsKey(level))
+            boolean special = level < 5;
+            if (!special && harvestLevels.containsKey(level))
                 throw new IllegalStateException("Duplicate harvest level: " + level + ". Same as " + harvestLevels.get(level).getId());
+            if (special && (!object.has("better") && !object.has("worse")))
+                throw new RuntimeException("Special tiers (level < 5) need to have ordering!");
+
             TextColor color = Optional.ofNullable(object.get("color"))
                     .map(e -> TextColor.parseColor(e.getAsString()))
                     .orElse(null);
 
-            HLTTier tier = new HLTTier(id, level, color);
+            List<ResourceLocation> betterTiers = new ArrayList<>();
+            if (object.has("better")) {
+                object.getAsJsonArray("better").asList().stream()
+                        .map(JsonElement::getAsString)
+                        .map(this::tierId)
+                        .forEach(betterTiers::add);
+            }
 
-            if (object.has("icons"))
+            List<ResourceLocation> worseTiers = new ArrayList<>();
+            if (object.has("worse")) {
+                object.getAsJsonArray("worse").asList().stream()
+                        .map(JsonElement::getAsString)
+                        .map(this::tierId)
+                        .forEach(betterTiers::add);
+            }
+
+            HLTTier tier = new HLTTier(id, level, color, betterTiers, worseTiers);
+
+            if (object.has("icons")) {
                 object.getAsJsonObject("icons").entrySet().forEach(entry -> {
                     TagKey<Block> mineableTag = TagKey.create(ForgeRegistries.Keys.BLOCKS, new ResourceLocation(entry.getKey()));
                     ItemStack icon = Utils.getItemStack(entry.getValue().getAsString());
                     tier.setIcon(mineableTag, icon);
                 });
+            }
 
-            return tier;
+
+            if (special) {
+                specialOrderingTiers.add(tier);
+            } else {
+                harvestLevels.put(tier.getLevel(), tier);
+            }
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to load harvest level from " + file, e);
         }
@@ -104,17 +141,17 @@ public class HarvestLevelManager {
             ItemHarvestLevelOverride override = new ItemHarvestLevelOverride(item);
             entry.getValue().getAsJsonObject().entrySet().forEach(e -> {
                 TagKey<Block> mineableTag = TagKey.create(ForgeRegistries.Keys.BLOCKS, new ResourceLocation(e.getKey()));
-
-                String tierString = e.getValue().getAsString();
-                if (!tierString.contains(":"))
-                    tierString = HarvestLevelTweaker.MOD_ID + ":" + tierString;
-
-                ResourceLocation tier = new ResourceLocation(tierString);
-                override.add(mineableTag, tier);
+                override.add(mineableTag, tierId(e.getValue().getAsString()));
             });
 
             overrides.put(item, override);
         });
+    }
+
+    private ResourceLocation tierId(String tierString) {
+        if (!tierString.contains(":"))
+            tierString = HarvestLevelTweaker.MOD_ID + ":" + tierString;
+        return new ResourceLocation(tierString);
     }
 
     public HLTTier getTier(int level) {
