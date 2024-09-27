@@ -36,7 +36,8 @@ Json Format: <br>
   "worse": ["<tier_id>", ...], 
   "color": "<color>", 
   "icons": {
-    "<mineable tag>": "<item id>"
+    "<mineable tag>": "<item id>",
+    ...
   }
 }
 ```
