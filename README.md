@@ -15,13 +15,14 @@ Currently supports:
   * [Table of Contents](#table-of-contents)
   * [Add New Harvest Levels](#add-new-harvest-levels)
     * [Example: `cobalt.json`:](#example-cobaltjson)
-    * [Example: `copper.json`:](#example-copperjson)
+  * [Level Ordering](#level-ordering)
+    * [Example: `ordering.json`:](#example-orderingjson)
   * [Override Item Harvest Level and Harvest Type](#override-item-harvest-level-and-harvest-type)
   * [Set Block Harvest Level](#set-block-harvest-level)
   * [Localization and custom vanilla level names](#localization-and-custom-vanilla-level-names)
   * [Client Config](#client-config)
   * [Commands](#commands)
-  * [Set Tinker's Construct Material Level (1.18 Only)](#set-tinkers-construct-material-level-118-only)
+  * [Set Tinker's Construct Material Level](#set-tinkers-construct-material-level)
 <!-- TOC -->
 
 ## Add New Harvest Levels
@@ -31,10 +32,8 @@ For example: `cobalt.json` will create a new level with id `cobalt`<br>
 Json Format: <br>
 ```
 {
-  "level": <level>,
-  "better": ["<tier_id>", ...], 
-  "worse": ["<tier_id>", ...], 
-  "color": "<color>", 
+  "color": "<color>",
+  "level": <level>, 
   "icons": {
     "<mineable tag>": "<item id>",
     ...
@@ -42,19 +41,16 @@ Json Format: <br>
 }
 ```
 
-| Field    | Type         | Required                                                      | Description                                                                                                                                        | Example                                                     |
-|----------|--------------|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
-| `level`  | Integer      | Yes                                                           | Order/tier of the custom level. No duplicates with other levels. If lower than `5`, `better` or `worse` field is required and duplicate is allowed | `5`                                                         |
-| `better` | String Array | Required if `level` is lower than `5` and `worse` is not set  | Levels that are better than this level, works only when `level` is lower than `5`                                                                  | `["minecraft:netherite"]`                                   |
-| `worse`  | String Array | Required if `level` is lower than `5` and `better` is not set | Levels that are worse than this level, works only when `level` is lower than `5`                                                                   | `["minecraft:diamond"]`                                     |
-| `color`  | String       | No (Default: `white`)                                         | Color of the harvest level in hex format (prefix `#`) or color name                                                                                | `"#0047ab"` or `"blue"`                                     |
-| `icons`  | Json Object  | No                                                            | Icons for the harvest level in `"<mineable_tag>": "<item id>"` format                                                                              | `{"minecraft:mineable/pickaxe": "minecraft:stone_pickaxe"}` |
+| Field   | Type        | Default Value | Description                                                                                               | Example                                                     |
+|---------|-------------|---------------|-----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| `color` | String      | `"white"`     | Color of the harvest level in hex format (prefix `#`) or color name                                       | `"#0047ab"` or `"blue"`                                     |
+| `level` | Integer     | `0`           | Numerical tier of the harvest level for compatibility. <br> Does not affect the actual ordering of levels | `5`                                                         |
+| `icons` | Json Object | `{}`          | Icons for the harvest level in `"<mineable_tag>": "<item id>"` format                                     | `{"minecraft:mineable/pickaxe": "minecraft:stone_pickaxe"}` |
 
 ### Example: `cobalt.json`:
 ```json
 {
-  "level": 5,
-  "color": "#0047ab", 
+  "color": "#0047ab",
   "icons": {
     "minecraft:mineable/pickaxe": "kubejs:cobalt_pickaxe",
     "minecraft:mineable/axe": "kubejs:cobalt_axe",
@@ -63,23 +59,32 @@ Json Format: <br>
   }
 }
 ```
-This will create a new level with id `cobalt` and level 5. <br>
-Or it can be as simple as:
+This will create a new level with id `cobalt`<br>
+It can also be as simple as:
 ```json
-{
-  "level": 5
-}
+{}
 ```
 
-### Example: `copper.json`:
+
+## Level Ordering
+`config/hltweaker/ordering.json` controls which levels are better or worse than others. <br>
+This file will be automatically generated when launching the game if it does not exist. <br>
+Levels are ordered from worst to best. <br>
+You can also change the order of vanilla levels and levels from other mods, although levels from other mods won't be automatically added to this file. <br>
+### Example: `ordering.json`:
 ```json
-{
-  "level": 1,
-  "better": ["minecraft:iron"],
-  "worse": ["minecraft:stone"]
-}
+[
+  "minecraft:wood",
+  "minecraft:gold",
+  "minecraft:stone",
+  "minecraft:iron",
+  "minecraft:diamond",
+  "hltweaker:cobalt",
+  "minecraft:netherite",
+  "somemod:somelevel"
+]
 ```
-This will create a new level with id `copper` between tier stone and iron (better than stone, worse than iron) <br>
+
 
 ## Override Item Harvest Level and Harvest Type
 Find the file `config/hltweaker/item_harvest_level_overrides.json` <br>
@@ -131,6 +136,7 @@ Example `data/hltweaker/tags/blocks/needs_cobalt_tool.json`:
 }
 ```
 This will set all blocks under `minecraft:stone` tag and cobalt block to require cobalt level tools. <br>
+See more: https://minecraft.wiki/w/Tag
 
 ## Localization and custom vanilla level names
 * Translation key for custom harvest level is `text.hltweaker.level.<level id>` <br>
@@ -150,7 +156,7 @@ More details can be found in the config file.
 `/hltweaker levels all` - Show all harvest levels that are registered in the game <br>
 `/hltweaker overrides` - Show item harvest level overrides <br>
 
-## Set Tinker's Construct Material Level (1.18 Only)
+## Set Tinker's Construct Material Level
 In your datapack for tinker's construct, set the harvest level of the material to `hltweaker:<level id>`
 
 

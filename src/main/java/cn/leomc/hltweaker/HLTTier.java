@@ -28,18 +28,14 @@ public class HLTTier implements Tier {
     private final TagKey<Block> tag;
     private final MutableComponent name;
     private final Map<TagKey<Block>, ItemStack> icons;
-    private final List<ResourceLocation> betterTiers;
-    private final List<ResourceLocation> worseTiers;
 
-    public HLTTier(String id, int level, @Nullable TextColor color, List<ResourceLocation> betterTiers, List<ResourceLocation> worseTiers) {
+    public HLTTier(String id, @Nullable Integer level, @Nullable TextColor color) {
         this.id = new ResourceLocation(HarvestLevelTweaker.MOD_ID, id);
-        this.level = level;
+        this.level = level == null ? 0 : level;
         this.color = color == null ? TextColor.fromLegacyFormat(ChatFormatting.WHITE) : color;
         this.tag = BlockTags.create(new ResourceLocation(HarvestLevelTweaker.MOD_ID, "needs_" + id + "_tool"));
         this.name = Component.translatable("text.hltweaker.level." + id).withStyle(style -> style.withColor(color));
         this.icons = new HashMap<>();
-        this.betterTiers = betterTiers;
-        this.worseTiers = worseTiers;
     }
 
     @Override
@@ -107,14 +103,6 @@ public class HLTTier implements Tier {
 
     public Map<TagKey<Block>, ItemStack> getIcons() {
         return Collections.unmodifiableMap(icons);
-    }
-
-    public List<ResourceLocation> getBetterTiers() {
-        return Collections.unmodifiableList(betterTiers);
-    }
-
-    public List<ResourceLocation> getWorseTiers() {
-        return Collections.unmodifiableList(worseTiers);
     }
 
     @Override

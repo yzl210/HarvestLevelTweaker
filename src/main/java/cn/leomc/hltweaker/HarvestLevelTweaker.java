@@ -32,6 +32,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -61,6 +62,7 @@ public class HarvestLevelTweaker {
 
         manager = new HarvestLevelManager(configFolder);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onFMLCommonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onFMLLoadComplete);
 
         MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
         MinecraftForge.EVENT_BUS.addListener(this::onAddReloadListener);
@@ -73,6 +75,10 @@ public class HarvestLevelTweaker {
 
     private void onFMLCommonSetup(FMLCommonSetupEvent event) {
         manager.load();
+    }
+
+    private void onFMLLoadComplete(FMLLoadCompleteEvent event) {
+        manager.loadOrdering();
     }
 
     @OnlyIn(Dist.CLIENT)

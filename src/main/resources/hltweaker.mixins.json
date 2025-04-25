@@ -8,6 +8,8 @@
     "DiggerItemAccessor",
     "DiggerItemMixin",
     "ItemMixin",
+    "TiCHarvestTiersMixin",
+    "TierSortingRegistryAccessor",
     "TOPHarvestInfoToolsMixin"
   ],
   "client": [
