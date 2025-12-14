@@ -9,6 +9,7 @@
     "DiggerItemMixin",
     "ItemMixin",
     "TiCHarvestTiersMixin",
+    "TieredItemMixin",
     "TierSortingRegistryAccessor",
     "TOPHarvestInfoToolsMixin"
   ],

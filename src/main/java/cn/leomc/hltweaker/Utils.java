@@ -87,6 +87,24 @@ public class Utils {
         return false;
     }
 
+    public static Tier getHighestTier(Item item) {
+        ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+        if (!isItemOverridden(item))
+            return null;
+
+        ItemHarvestLevelOverride override = HarvestLevelTweaker.getManager().getOverride(rl);
+        var highestTier = (Tier) null;
+
+        for (TagKey<Block> tag : override.mineableTags()) {
+            Tier tier = override.getTier(tag);
+            if (highestTier == null || highestTier.getLevel() < tier.getLevel()) {
+                highestTier = tier;
+            }
+        }
+
+        return highestTier;
+    }
+
     public static boolean canHarvestBlock(BlockState state, Player player) {
         return !state.requiresCorrectToolForDrops()
                 || Utils.checkItemOverrides(player.getMainHandItem().getItem(), state)
